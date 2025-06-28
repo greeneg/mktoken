@@ -37,13 +37,11 @@ func init() {
 	}
 }
 
-func parsePbdkf2Hash(line string) (string, int, int, []byte, []byte, error) {
-	parts := strings.Split(line, ":")
-
-	_hashType := strings.ReplaceAll(parts[0], "{X-PBDKF2}", "")
+func parseHashType(line string) (string, int, error) {
+	_hashType := strings.ReplaceAll(line, "{X-PBDKF2}", "")
 	keyBytes, err := strconv.Atoi(strings.Split(_hashType, "+")[1])
 	if err != nil {
-		return "", 0, 0, nil, nil, fmt.Errorf("invalid key length: %v", err)
+		return "", 0, fmt.Errorf("invalid key length: %v", err)
 	}
 
 	var keyLength int
@@ -55,10 +53,21 @@ func parsePbdkf2Hash(line string) (string, int, int, []byte, []byte, error) {
 	case 128:
 		keyLength = 16 // 128 bits = 16 bytes
 	default:
-		return "", 0, 0, nil, nil, fmt.Errorf("unsupported key length: %d bits", keyBytes)
+		return "", 0, fmt.Errorf("unsupported key length: %d bits", keyBytes)
 	}
 
 	hashType := strings.Split(_hashType, "+")[0]
+
+	return hashType, keyLength, nil
+}
+
+func parsePbdkf2Hash(line string) (string, int, int, []byte, []byte, error) {
+	parts := strings.Split(line, ":")
+
+	hashType, keyLength, err := parseHashType(parts[0])
+	if err != nil {
+		return "", 0, 0, nil, nil, fmt.Errorf("error parsing hash type: %v", err)
+	}
 
 	iters, err := strconv.Atoi(parts[1])
 	if err != nil {
