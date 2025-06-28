@@ -20,5 +20,6 @@
 # Go workspace file
 go.work
 
+cmd/cmptoken/cmptoken
 cmd/mktoken/mktoken
 tokens.lst

@@ -4,6 +4,7 @@ import (
 	"crypto/pbkdf2"
 	"crypto/rand"
 	"crypto/sha3"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -151,7 +152,15 @@ func main() {
 		fmt.Printf("Derived key length: %d\n", len(dk))
 		fmt.Printf("Derived key: %x\n", dk)
 	}
-	hashedToken := fmt.Sprintf("{X-PBDKF2}%s+%d:%d:%x:%x\n", d.hashType, d.cipherLength, d.iters, salt, dk)
+	b64Salt := base64.StdEncoding.EncodeToString(salt)
+	if *debug {
+		fmt.Printf("Base64 Encoded Salt: %s\n", b64Salt)
+	}
+	b64key := base64.StdEncoding.EncodeToString(dk)
+	if *debug {
+		fmt.Printf("Base64 Encoded Key: %s\n", b64key)
+	}
+	hashedToken := fmt.Sprintf("{X-PBDKF2}%s+%d:%d:%s:%s\n", d.hashType, d.cipherLength, d.iters, b64Salt, b64key)
 	if *debug {
 		fmt.Printf("Hashed token: %s\n", hashedToken)
 	}
