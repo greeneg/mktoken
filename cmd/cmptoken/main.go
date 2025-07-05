@@ -41,7 +41,7 @@ func parseHashType(line string) (string, int, error) {
 	_hashType := strings.ReplaceAll(line, "{X-PBDKF2}", "")
 	keyBytes, err := strconv.Atoi(strings.Split(_hashType, "+")[1])
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid key length: %v", err)
+		return "", 0, fmt.Errorf("invalid hash type value: %v", err)
 	}
 
 	var keyLength int
@@ -71,7 +71,7 @@ func parsePbdkf2Hash(line string) (string, int, int, []byte, []byte, error) {
 
 	iters, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return "", 0, 0, nil, nil, fmt.Errorf("invalid iteration count: %v", err)
+		return "", 0, 0, nil, nil, fmt.Errorf("invalid iteration value: %v", err)
 	}
 
 	salt, err := base64.StdEncoding.DecodeString(parts[2])
@@ -93,7 +93,7 @@ func main() {
 	// open the tokens file
 	tokensFile, err := os.Open(*optTokFile)
 	if err != nil {
-		fmt.Println("Error opening tokens file:", err)
+		fmt.Printf("error opening tokens file: %v\n", err)
 		os.Exit(1)
 	}
 	defer tokensFile.Close()
